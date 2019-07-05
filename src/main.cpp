@@ -49,14 +49,19 @@ int main(int argc, char **argv) {
         cout << solution[i] << "\t";
 
     }
-    cout << endl << "Custo: " << getCusto(solution) << endl;
-    movSwap(solution, 2, 7);
+    double custo1 = getCusto(solution);
+    cout << endl << "Custo: " << custo1 << endl;
+    double delta = deltaSwap(solution,2,6);
+    movSwap(solution, 2, 6);
 
+    double custo2 = getCusto(solution);
     for (int i = 0; i <= dimension; i++) {
         cout << solution[i] << "\t";
 
     }
     cout << endl << "Custo: " << getCusto(solution) << endl;
+
+    cout << "Delta Seboso : " << custo2 - custo1 << endl << "Delta Nao seboso: " << delta << endl;
 
 
 
@@ -164,9 +169,12 @@ double deltaSwap(vector<int> &v, int no1, int no2){
     double** m = matrizAdj; //diminui o tamanho da declaraçao ali embaixo
     double delta = 0;
     if(no1 == no2) return delta;
+    else if(no2 == no1 + 1){    //nesse caso, duas arestas sao removidas, e duas adicionadas. A que conecta os nos adjacentes permanece.
+        delta = (m[v[no1]][v[no2+1]] + m[v[no2]][v[no1 - 1]]) - (m[v[no1]][v[no1 - 1]] + m[v[no2]][v[no2 + 1]]);
+    }
     else {
-        delta = m[v[no1]][v[no2 - 1]] + m[v[no1]][v[no2 + 1]] + m[v[no2]][v[no1 - 1]] + m[v[no2]][v[no1 + 1]]
-                - m[v[no1]][v[no1 - 1]] + m[v[no1]][v[no1 + 1]] + m[v[no2]][v[no2 - 1]] + m[v[no2]][v[no2 + 1]];
+        delta = (m[v[no1]][v[no2 - 1]] + m[v[no1]][v[no2 + 1]] + m[v[no2]][v[no1 - 1]] + m[v[no2]][v[no1 + 1]])
+                - (m[v[no1]][v[no1 - 1]] + m[v[no1]][v[no1 + 1]] + m[v[no2]][v[no2 - 1]] + m[v[no2]][v[no2 + 1]]);
     }
 
     return delta;
