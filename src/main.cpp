@@ -22,8 +22,10 @@ vector<int> constructSolution();                   //constroi uma solucao
 vector<CustoInsercao>
 criaRestrita(double, vector<CustoInsercao> &); //cria uma lista restrita com os "alpha" melhores custos
 
-double deltaSwap(vector<int> &, int, int);     //calcula o delta de determinado movimento swap
+double deltaSwap(vector<int> &, int, int);     //calcula o delta de determinado movimento swap (troca de nos)
 void movSwap(vector<int> &, int, int);            //executa um movimento swap
+void mov2Opt(vector<int> &, int, int);
+double delta2Opt(vector<int> &, int no1, int no2);      //calcula o delta de determinado movimento 2-opt (inverte o subtour que vai de no1 a no2 )
 
 double getCusto(vector<int> &);                      //custo total da solucao
 vector<CustoInsercao>
@@ -45,23 +47,32 @@ int main(int argc, char **argv) {
     printData();
     vector<int> solution = constructSolution();
 
+
+    cout << "Solucao sem mov: " << endl;
     for (int i = 0; i <= dimension; i++) {
         cout << solution[i] << "\t";
 
     }
-    double custo1 = getCusto(solution);
-    cout << endl << "Custo: " << custo1 << endl;
-    double delta = deltaSwap(solution,2,6);
-    movSwap(solution, 2, 6);
 
+    cout << endl << "Solucao com swap: " << endl;
+    movSwap(solution, 2 ,4);
+    double custo1 = getCusto(solution);
+    for (int i = 0; i <= dimension; i++) {
+        cout << solution[i] << "\t";
+
+    }
+
+    cout << endl << "Solucao com 2opt: " << endl;
+    double delta = delta2Opt(solution, 1, 2);
+    mov2Opt(solution, 1 ,2);
     double custo2 = getCusto(solution);
     for (int i = 0; i <= dimension; i++) {
         cout << solution[i] << "\t";
 
     }
-    cout << endl << "Custo: " << getCusto(solution) << endl;
 
-    cout << "Delta Seboso : " << custo2 - custo1 << endl << "Delta Nao seboso: " << delta << endl;
+    cout << "Delta certo: " << delta << endl << "Delta seboso: " << custo2 - custo1 << endl;
+
 
 
 
@@ -175,6 +186,33 @@ double deltaSwap(vector<int> &v, int no1, int no2){
     else {
         delta = (m[v[no1]][v[no2 - 1]] + m[v[no1]][v[no2 + 1]] + m[v[no2]][v[no1 - 1]] + m[v[no2]][v[no1 + 1]])
                 - (m[v[no1]][v[no1 - 1]] + m[v[no1]][v[no1 + 1]] + m[v[no2]][v[no2 - 1]] + m[v[no2]][v[no2 + 1]]);
+    }
+
+    return delta;
+}
+
+void mov2Opt(vector<int> &v, int no1, int no2){
+    vector<int> newLista(v.size());
+    for(int i = 0; i < no1; i++){   //Solucao antes da subsequencia a ser invertida
+        newLista[i] = v[i];
+    }
+
+    for(int i = no1, j = no2; i <= no2; i++, j--){ //Inversao da subsequencia
+        newLista[i] = v[j];
+    }
+
+    for(int i = no2 + 1; i < v.size(); i++){   //Solucao depois da subsequencia a ser invertida
+        newLista[i] = v[i];
+    }
+    v.swap(newLista);
+}
+
+double delta2Opt(vector<int> &v, int no1, int no2){
+    double** m = matrizAdj; //diminui o tamanho da declaraçao ali embaixo
+    double delta = 0;
+    if(no1 == no2) return delta;
+    else{
+        delta = (m[v[no1]][v[no2 + 1]] + m[v[no2]][v[no1 - 1]]) - (m[v[no1]][v[no1 - 1]] + m[v[no2]][v[no2 + 1]]);
     }
 
     return delta;
