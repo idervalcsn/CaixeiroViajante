@@ -1,0 +1,3 @@
+/home/iderval/Projects/caixeiroCerto/src/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/iderval/Projects/caixeiroCerto/src/cmake-build-debug/CMakeFiles/Caixeiro.dir
+/home/iderval/Projects/caixeiroCerto/src/cmake-build-debug/CMakeFiles/edit_cache.dir

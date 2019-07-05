@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/Caixeiro.dir/main.cpp.o CMakeFiles/Caixeiro.dir/readData.cpp.o  -o Caixeiro 
