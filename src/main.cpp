@@ -29,7 +29,7 @@ vector<CustoInsercao> listaDeCustos(vector<int>,vector<int>);
 int main(int argc, char** argv) {
 
 
-
+    srand(time(NULL));
     readData(argc, argv, &dimension, &matrizAdj);
     printData();
     vector<int> solution = constructSolution();
@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
         cout << solution[i] << endl;
 
     }
-    cout << getCusto(solution) << endl;
+    cout <<  "Custo: " << getCusto(solution) << endl;
 
     return 0;
 
@@ -53,7 +53,7 @@ bool    comparaCusto(CustoInsercao x, CustoInsercao y){
 
 vector<int> constructSolution(){
 
-    srand(time(NULL))
+
     vector<int> solucao = {1,1};  //Solucao comeca na cidade 1
     vector<int> candidatos;
     int tamanhoSubtour = 4;
@@ -65,7 +65,7 @@ vector<int> constructSolution(){
     }
 
     for(int i = 0; i < tamanhoSubtour; i++ ){ //Gerando subtour inicial
-        ;
+
         int j =  rand() % candidatos.size() ;
         solucao.insert(solucao.begin() + 1, candidatos[j] );
         candidatos.erase(candidatos.begin() + j);
