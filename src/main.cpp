@@ -26,6 +26,8 @@ double deltaSwap(vector<int> &, int, int);     //calcula o delta de determinado 
 void movSwap(vector<int> &, int, int);            //executa um movimento swap
 void mov2Opt(vector<int> &, int, int);
 double delta2Opt(vector<int> &, int no1, int no2);      //calcula o delta de determinado movimento 2-opt (inverte o subtour que vai de no1 a no2 )
+void movReinsertion(vector<int> &, int , int);          //executa um movimento reinsertion
+double deltaReinsertion(vector<int> &, int, int);
 
 double getCusto(vector<int> &);                      //custo total da solucao
 vector<CustoInsercao>
@@ -46,32 +48,27 @@ int main(int argc, char **argv) {
     readData(argc, argv, &dimension, &matrizAdj);
     printData();
     vector<int> solution = constructSolution();
-
+    double custo1, custo2, delta;
 
     cout << "Solucao sem mov: " << endl;
     for (int i = 0; i <= dimension; i++) {
         cout << solution[i] << "\t";
 
     }
+    custo1 = getCusto(solution);
 
-    cout << endl << "Solucao com swap: " << endl;
-    movSwap(solution, 2 ,4);
-    double custo1 = getCusto(solution);
+    cout << endl << "Solucao com reinsertion: " << endl;
+    delta = deltaReinsertion(solution, 2, 1);
+    movReinsertion(solution, 2, 1);
     for (int i = 0; i <= dimension; i++) {
         cout << solution[i] << "\t";
 
     }
+    custo2 = getCusto(solution);
 
-    cout << endl << "Solucao com 2opt: " << endl;
-    double delta = delta2Opt(solution, 1, 2);
-    mov2Opt(solution, 1 ,2);
-    double custo2 = getCusto(solution);
-    for (int i = 0; i <= dimension; i++) {
-        cout << solution[i] << "\t";
+    cout << "Delta certo: " << delta << endl;
+    cout << "Custo 1: " << custo1 << "\t" << "Custo 2: " << custo2 << " \t" << "Delta seboso: " << custo2 - custo1 << endl;
 
-    }
-
-    cout << "Delta certo: " << delta << endl << "Delta seboso: " << custo2 - custo1 << endl;
 
 
 
@@ -218,12 +215,38 @@ double delta2Opt(vector<int> &v, int no1, int no2){
     return delta;
 }
 
-void printData() {
-    cout << "dimension: " << dimension << endl;
-    for (size_t i = 1; i <= dimension; i++) {
-        for (size_t j = 1; j <= dimension; j++) {
-            cout << matrizAdj[i][j] << " ";
-        }
-        cout << endl;
-    }
+void movReinsertion(vector<int> &v, int no1, int no2){
+    int valor = v[no1];
+    v.erase(v.begin() + no1);
+    v.insert(v.begin() + no2, valor);
 }
+
+double deltaReinsertion(vector<int> &v, int no1, int no2) {
+    double **m = matrizAdj; //diminui o tamanho da declaraçao ali embaixo
+    double delta = 0;
+
+    if (no1 == no2) return delta;
+    else if (no1 < no2) {     //reinsercao em um indice maior do vetor
+        delta = (m[v[no1]][v[no2]] + m[v[no1]][v[no2 + 1]] + m[v[no1 - 1]][v[no1 + 1]]) -
+                (m[v[no1]][v[no1 + 1]] + m[v[no1]][v[no1 - 1]] + m[v[no2]][v[no2 + 1]]);
+
+
+    }
+    else{                     //reinsercao em um indice menor
+        delta = (m[v[no1]][v[no2]] + m[v[no1]][v[no2 - 1]] + m[v[no1 - 1]][v[no1 + 1]]) -
+                (m[v[no1]][v[no1 - 1]] + m[v[no1]][v[no1 + 1]] + m[v[no2]][v[no2 - 1]]);
+
+    }
+    return delta;
+}
+
+    void printData() {
+        cout << "dimension: " << dimension << endl;
+        for (size_t i = 1; i <= dimension; i++) {
+            for (size_t j = 1; j <= dimension; j++) {
+                cout << matrizAdj[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
+
