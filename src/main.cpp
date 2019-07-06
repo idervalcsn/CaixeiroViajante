@@ -26,8 +26,8 @@ double deltaSwap(vector<int> &, int, int);     //calcula o delta de determinado 
 void movSwap(vector<int> &, int, int);            //executa um movimento swap
 void mov2Opt(vector<int> &, int, int);
 double delta2Opt(vector<int> &, int no1, int no2);      //calcula o delta de determinado movimento 2-opt (inverte o subtour que vai de no1 a no2 )
-void movReinsertion(vector<int> &, int , int);          //executa um movimento reinsertion
-double deltaReinsertion(vector<int> &, int, int);
+void movReinsertion(vector<int> &, int , int, int);          //executa um movimento reinsertion
+double deltaReinsertion(vector<int> &, int, int, int);
 
 double getCusto(vector<int> &);                      //custo total da solucao
 vector<CustoInsercao>
@@ -58,8 +58,9 @@ int main(int argc, char **argv) {
     custo1 = getCusto(solution);
 
     cout << endl << "Solucao com reinsertion: " << endl;
-    delta = deltaReinsertion(solution, 2, 1);
-    movReinsertion(solution, 2, 1);
+    delta = deltaReinsertion(solution, 1, 4, 3);
+    movReinsertion(solution, 1, 4, 3);
+
     for (int i = 0; i <= dimension; i++) {
         cout << solution[i] << "\t";
 
@@ -215,28 +216,39 @@ double delta2Opt(vector<int> &v, int no1, int no2){
     return delta;
 }
 
-void movReinsertion(vector<int> &v, int no1, int no2){
-    int valor = v[no1];
-    v.erase(v.begin() + no1);
-    v.insert(v.begin() + no2, valor);
+void movReinsertion(vector<int> &v, int no1, int no2, int qnt){
+
+
+        for(int i = 1; i <= qnt; i++){
+            int valor = v[no1];
+            v.erase(v.begin() + no1);
+            v.insert(v.begin() + no2, valor);
+        }
+
+
 }
 
-double deltaReinsertion(vector<int> &v, int no1, int no2) {
+double deltaReinsertion(vector<int> &v, int no1, int no2, int quantidade) {
     double **m = matrizAdj; //diminui o tamanho da declaraçao ali embaixo
     double delta = 0;
 
     if (no1 == no2) return delta;
+
     else if (no1 < no2) {     //reinsercao em um indice maior do vetor
-        delta = (m[v[no1]][v[no2]] + m[v[no1]][v[no2 + 1]] + m[v[no1 - 1]][v[no1 + 1]]) -
-                (m[v[no1]][v[no1 + 1]] + m[v[no1]][v[no1 - 1]] + m[v[no2]][v[no2 + 1]]);
+        //delta = (m[v[no1]][v[no2]] + m[v[no1]][v[no2 + 1]] + m[v[no1 - 1]][v[no1 + 1]]) -
+        //        (m[v[no1]][v[no1 + 1]] + m[v[no1]][v[no1 - 1]] + m[v[no2]][v[no2 + 1]]);
+        delta = (m[v[no1]][v[no2]] + m[v[no1 + (quantidade - 1)]][v[no2 + 1]] + m[v[no1 - 1]][v[no1 + quantidade]]) -
+        (m[v[no1]][v[no1 - 1]] + m[v[no1 + (quantidade - 1)]][v[no1 + quantidade]] + m[v[no2]][v[no2 + 1]]);
 
 
-    }
-    else{                     //reinsercao em um indice menor
+
+    } else {                     //reinsercao em um indice menor
         delta = (m[v[no1]][v[no2]] + m[v[no1]][v[no2 - 1]] + m[v[no1 - 1]][v[no1 + 1]]) -
                 (m[v[no1]][v[no1 - 1]] + m[v[no1]][v[no1 + 1]] + m[v[no2]][v[no2 - 1]]);
 
     }
+
+
     return delta;
 }
 
