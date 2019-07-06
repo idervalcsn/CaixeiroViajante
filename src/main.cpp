@@ -58,8 +58,8 @@ int main(int argc, char **argv) {
     custo1 = getCusto(solution);
 
     cout << endl << "Solucao com reinsertion: " << endl;
-    delta = deltaReinsertion(solution, 1, 4, 3);
-    movReinsertion(solution, 1, 4, 3);
+    delta = deltaReinsertion(solution, 4, 1, 3);
+    movReinsertion(solution, 4, 1, 3);
 
     for (int i = 0; i <= dimension; i++) {
         cout << solution[i] << "\t";
@@ -243,8 +243,10 @@ double deltaReinsertion(vector<int> &v, int no1, int no2, int quantidade) {
 
 
     } else {                     //reinsercao em um indice menor
-        delta = (m[v[no1]][v[no2]] + m[v[no1]][v[no2 - 1]] + m[v[no1 - 1]][v[no1 + 1]]) -
-                (m[v[no1]][v[no1 - 1]] + m[v[no1]][v[no1 + 1]] + m[v[no2]][v[no2 - 1]]);
+        //delta = (m[v[no1]][v[no2]] + m[v[no1]][v[no2 - 1]] + m[v[no1 - 1]][v[no1 + 1]]) -
+        //        (m[v[no1]][v[no1 - 1]] + m[v[no1]][v[no1 + 1]] + m[v[no2]][v[no2 - 1]]);
+        delta = (m[v[no1]][v[no2]] + m[v[no1 - (quantidade - 1)]][v[no2 - 1]] + m[v[no1 - quantidade]][v[no1 + 1]]) -
+                (m[v[no1 - (quantidade - 1)]][v[no1 - quantidade]] + m[v[no1]][v[no1 + 1]] + m[v[no2]][v[no2 - 1]]);
 
     }
 
