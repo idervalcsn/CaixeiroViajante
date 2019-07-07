@@ -23,10 +23,12 @@ vector<CustoInsercao>
 criaRestrita(double, vector<CustoInsercao> &); //cria uma lista restrita com os "alpha" melhores custos
 
 double deltaSwap(vector<int> &, int, int);     //calcula o delta de determinado movimento swap (troca de nos)
-void movSwap(vector<int> &, int, int);            //executa um movimento swap
+void movSwap(vector<int> &);            //executa um movimento swap
+void melhorMov2Opt(vector<int> &);
 void mov2Opt(vector<int> &, int, int);
-double delta2Opt(vector<int> &, int no1, int no2);      //calcula o delta de determinado movimento 2-opt (inverte o subtour que vai de no1 a no2 )
-void movReinsertion(vector<int> &, int , int, int);          //executa um movimento reinsertion
+double delta2Opt(vector<int> &, int ,int);      //calcula o delta de determinado movimento 2-opt (inverte o subtour que vai de no1 a no2 )
+void melhorReinsertion(vector<int> &,int);
+void movReinsertion(vector<int> &, int, int, int);          //executa um movimento reinsertion
 double deltaReinsertion(vector<int> &, int, int, int);
 
 double getCusto(vector<int> &);                      //custo total da solucao
@@ -57,18 +59,22 @@ int main(int argc, char **argv) {
     }
     custo1 = getCusto(solution);
 
-    cout << endl << "Solucao com reinsertion: " << endl;
-    delta = deltaReinsertion(solution, 4, 1, 3);
-    movReinsertion(solution, 4, 1, 3);
+
+    cout << endl << "Solucao com r3insertion: " << endl;
+    melhorReinsertion(solution,3);
 
     for (int i = 0; i <= dimension; i++) {
         cout << solution[i] << "\t";
 
     }
-    custo2 = getCusto(solution);
 
-    cout << "Delta certo: " << delta << endl;
-    cout << "Custo 1: " << custo1 << "\t" << "Custo 2: " << custo2 << " \t" << "Delta seboso: " << custo2 - custo1 << endl;
+
+    custo2 = getCusto(solution);
+    delta = custo2 - custo1;
+    cout << endl << "Custo 1: " << custo1 << "\t" << "Custo 2: " << custo2 << "\t" << "Delta: " << delta << endl;
+
+
+
 
 
 
@@ -167,10 +173,27 @@ double getCusto(vector<int> &solucao) {
     return custo;
 }
 
-void movSwap(vector<int> &v, int no1, int no2){
-    int temp = v[no1];
+void movSwap(vector<int> &v){
+    /*int temp = v[no1];
     v[no1] = v[no2];
-    v[no2] = temp;
+    v[no2] = temp;*/
+    double menorDelta = 0;
+    double delta;
+    int x = 0, y = 0; //guarda as coordenadas do melhor swap
+
+    for(int i = 1; i < v.size() - 1; i++) {//Ignora o primeiro e ultimo. Por consequencia, o penultimo tbm, pq ja vai ter realizado swap com todos.
+        for(int j = i + 1; j < v.size() - 1; j++){  //os swaps comecam a partir do item subsequente ao item "i"
+            delta = deltaSwap(v, i, j);
+            if(delta < menorDelta){
+                menorDelta = delta;
+                x = i;
+                y = j;
+            }
+        }
+    }
+    if(x != 0 && y != 0) {
+        swap(v[x],v[y]);
+    }
 
 }
 
@@ -187,6 +210,26 @@ double deltaSwap(vector<int> &v, int no1, int no2){
     }
 
     return delta;
+}
+
+void melhorMov2Opt(vector<int> &v){
+    double menorDelta = 0;
+    double delta;
+    int x = 0, y = 0; //guarda as coordenadas do melhor 2opt
+
+    for(int i = 1; i < v.size() - 2; i++) {//O twopt precisa começar no maximo no antepenultimo elemento,
+        for(int j = i + 1; j < v.size() - 1; j++){  //e terminar no penultimo.
+            delta = delta2Opt(v, i, j);
+            if(delta < menorDelta){
+                menorDelta = delta;
+                x = i;
+                y = j;
+            }
+        }
+    }
+    if(x != 0 && y != 0) {
+        mov2Opt(v,x,y);
+    }
 }
 
 void mov2Opt(vector<int> &v, int no1, int no2){
@@ -215,7 +258,40 @@ double delta2Opt(vector<int> &v, int no1, int no2){
 
     return delta;
 }
+void melhorReinsertion(vector<int> &v, int qnt){
+    double menorDelta = 0;
+    double delta;
+    int x = 0, y = 0; //guarda as coordenadas da melhor reinsertion
 
+    if(qnt == 1) {
+        for (int i = 1; i < v.size() - 1; i++) {//Reinsertion pode ser de qualquer lugar.
+            for (int j = 1; j < v.size() - 1; j++) {  //A qualquer lugar. (menos nas bordas)
+                delta = deltaReinsertion(v, i, j, qnt);
+                if (delta < menorDelta) {
+                    menorDelta = delta;
+                    x = i;
+                    y = j;
+                }
+            }
+        }
+    }
+    else{
+        for (int i = 1; i < v.size() - 1; i++) {// or-2-op/or-3-opt precisa comecar no maximo no penultimo antes do size
+            for (int j = 1; j < v.size() - (qnt + 1); j++) {  //E terminar no maximo qnt antes de size
+                delta = deltaReinsertion(v, i, j, qnt);
+                if (delta < menorDelta && abs((i - j)) >= qnt) {
+                    menorDelta = delta;
+                    x = i;
+                    y = j;
+                }
+            }
+        }
+
+    }
+    if(x != 0 && y != 0) {
+        movReinsertion(v,x,y,qnt);
+    }
+}
 void movReinsertion(vector<int> &v, int no1, int no2, int qnt){
 
 
