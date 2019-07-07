@@ -25,9 +25,13 @@ criaRestrita(double, vector<CustoInsercao> &); //cria uma lista restrita com os 
 double deltaSwap(vector<int> &, int, int);     //calcula o delta de determinado movimento swap (troca de nos)
 void movSwap(vector<int> &);            //executa um movimento swap
 void melhorMov2Opt(vector<int> &);
+
 void mov2Opt(vector<int> &, int, int);
-double delta2Opt(vector<int> &, int ,int);      //calcula o delta de determinado movimento 2-opt (inverte o subtour que vai de no1 a no2 )
-void melhorReinsertion(vector<int> &,int);
+
+double delta2Opt(vector<int> &, int,
+                 int);      //calcula o delta de determinado movimento 2-opt (inverte o subtour que vai de no1 a no2 )
+void melhorReinsertion(vector<int> &, int);
+
 void movReinsertion(vector<int> &, int, int, int);          //executa um movimento reinsertion
 double deltaReinsertion(vector<int> &, int, int, int);
 
@@ -36,6 +40,7 @@ vector<CustoInsercao>
 listaDeCustos(vector<int> &, vector<int> &);   //cria uma lista de custos baseada nos candidatos restantes
 void printData();
 
+void rnvd(vector<int> &);
 void remover(vector<int> &, int);                 //remover item atraves do valor
 
 
@@ -60,8 +65,8 @@ int main(int argc, char **argv) {
     custo1 = getCusto(solution);
 
 
-    cout << endl << "Solucao com r3insertion: " << endl;
-    melhorReinsertion(solution,3);
+    cout << endl << "Solucao com rnvd: " << endl;
+    rnvd(solution);
 
     for (int i = 0; i <= dimension; i++) {
         cout << solution[i] << "\t";
@@ -72,12 +77,6 @@ int main(int argc, char **argv) {
     custo2 = getCusto(solution);
     delta = custo2 - custo1;
     cout << endl << "Custo 1: " << custo1 << "\t" << "Custo 2: " << custo2 << "\t" << "Delta: " << delta << endl;
-
-
-
-
-
-
 
 
     return 0;
@@ -95,7 +94,7 @@ vector<int> constructSolution() {
 
     vector<int> solucao = {1, 1};  //Solucao comeca na cidade 1
     vector<int> candidatos;
-    int tamanhoSubtour = 4;
+    int tamanhoSubtour = 3;
     //double custoTotal = matrizAdj[1][1];
 
     for (int i = 2; i <= dimension; i++) { //Populando a lista de candidatos
@@ -173,7 +172,7 @@ double getCusto(vector<int> &solucao) {
     return custo;
 }
 
-void movSwap(vector<int> &v){
+void movSwap(vector<int> &v) {
     /*int temp = v[no1];
     v[no1] = v[no2];
     v[no2] = temp;*/
@@ -181,30 +180,31 @@ void movSwap(vector<int> &v){
     double delta;
     int x = 0, y = 0; //guarda as coordenadas do melhor swap
 
-    for(int i = 1; i < v.size() - 1; i++) {//Ignora o primeiro e ultimo. Por consequencia, o penultimo tbm, pq ja vai ter realizado swap com todos.
-        for(int j = i + 1; j < v.size() - 1; j++){  //os swaps comecam a partir do item subsequente ao item "i"
+    for (int i = 1; i < v.size() -
+                        1; i++) {//Ignora o primeiro e ultimo. Por consequencia, o penultimo tbm, pq ja vai ter realizado swap com todos.
+        for (int j = i + 1; j < v.size() - 1; j++) {  //os swaps comecam a partir do item subsequente ao item "i"
             delta = deltaSwap(v, i, j);
-            if(delta < menorDelta){
+            if (delta < menorDelta) {
                 menorDelta = delta;
                 x = i;
                 y = j;
             }
         }
     }
-    if(x != 0 && y != 0) {
-        swap(v[x],v[y]);
+    if (x != 0 && y != 0) {
+        swap(v[x], v[y]);
     }
 
 }
 
-double deltaSwap(vector<int> &v, int no1, int no2){
-    double** m = matrizAdj; //diminui o tamanho da declaraçao ali embaixo
+double deltaSwap(vector<int> &v, int no1, int no2) {
+    double **m = matrizAdj; //diminui o tamanho da declaraçao ali embaixo
     double delta = 0;
-    if(no1 == no2) return delta;
-    else if(no2 == no1 + 1){    //nesse caso, duas arestas sao removidas, e duas adicionadas. A que conecta os nos adjacentes permanece.
-        delta = (m[v[no1]][v[no2+1]] + m[v[no2]][v[no1 - 1]]) - (m[v[no1]][v[no1 - 1]] + m[v[no2]][v[no2 + 1]]);
-    }
-    else {
+    if (no1 == no2) return delta;
+    else if (no2 == no1 +
+                    1) {    //nesse caso, duas arestas sao removidas, e duas adicionadas. A que conecta os nos adjacentes permanece.
+        delta = (m[v[no1]][v[no2 + 1]] + m[v[no2]][v[no1 - 1]]) - (m[v[no1]][v[no1 - 1]] + m[v[no2]][v[no2 + 1]]);
+    } else {
         delta = (m[v[no1]][v[no2 - 1]] + m[v[no1]][v[no2 + 1]] + m[v[no2]][v[no1 - 1]] + m[v[no2]][v[no1 + 1]])
                 - (m[v[no1]][v[no1 - 1]] + m[v[no1]][v[no1 + 1]] + m[v[no2]][v[no2 - 1]] + m[v[no2]][v[no2 + 1]]);
     }
@@ -212,58 +212,59 @@ double deltaSwap(vector<int> &v, int no1, int no2){
     return delta;
 }
 
-void melhorMov2Opt(vector<int> &v){
+void melhorMov2Opt(vector<int> &v) {
     double menorDelta = 0;
     double delta;
     int x = 0, y = 0; //guarda as coordenadas do melhor 2opt
 
-    for(int i = 1; i < v.size() - 2; i++) {//O twopt precisa começar no maximo no antepenultimo elemento,
-        for(int j = i + 1; j < v.size() - 1; j++){  //e terminar no penultimo.
+    for (int i = 1; i < v.size() - 2; i++) {//O twopt precisa começar no maximo no antepenultimo elemento,
+        for (int j = i + 1; j < v.size() - 1; j++) {  //e terminar no penultimo.
             delta = delta2Opt(v, i, j);
-            if(delta < menorDelta){
+            if (delta < menorDelta) {
                 menorDelta = delta;
                 x = i;
                 y = j;
             }
         }
     }
-    if(x != 0 && y != 0) {
-        mov2Opt(v,x,y);
+    if (x != 0 && y != 0) {
+        mov2Opt(v, x, y);
     }
 }
 
-void mov2Opt(vector<int> &v, int no1, int no2){
+void mov2Opt(vector<int> &v, int no1, int no2) {
     vector<int> newLista(v.size());
-    for(int i = 0; i < no1; i++){   //Solucao antes da subsequencia a ser invertida
+    for (int i = 0; i < no1; i++) {   //Solucao antes da subsequencia a ser invertida
         newLista[i] = v[i];
     }
 
-    for(int i = no1, j = no2; i <= no2; i++, j--){ //Inversao da subsequencia
+    for (int i = no1, j = no2; i <= no2; i++, j--) { //Inversao da subsequencia
         newLista[i] = v[j];
     }
 
-    for(int i = no2 + 1; i < v.size(); i++){   //Solucao depois da subsequencia a ser invertida
+    for (int i = no2 + 1; i < v.size(); i++) {   //Solucao depois da subsequencia a ser invertida
         newLista[i] = v[i];
     }
     v.swap(newLista);
 }
 
-double delta2Opt(vector<int> &v, int no1, int no2){
-    double** m = matrizAdj; //diminui o tamanho da declaraçao ali embaixo
+double delta2Opt(vector<int> &v, int no1, int no2) {
+    double **m = matrizAdj; //diminui o tamanho da declaraçao ali embaixo
     double delta = 0;
-    if(no1 == no2) return delta;
-    else{
+    if (no1 == no2) return delta;
+    else {
         delta = (m[v[no1]][v[no2 + 1]] + m[v[no2]][v[no1 - 1]]) - (m[v[no1]][v[no1 - 1]] + m[v[no2]][v[no2 + 1]]);
     }
 
     return delta;
 }
-void melhorReinsertion(vector<int> &v, int qnt){
+
+void melhorReinsertion(vector<int> &v, int qnt) {
     double menorDelta = 0;
     double delta;
     int x = 0, y = 0; //guarda as coordenadas da melhor reinsertion
 
-    if(qnt == 1) {
+    if (qnt == 1) {
         for (int i = 1; i < v.size() - 1; i++) {//Reinsertion pode ser de qualquer lugar.
             for (int j = 1; j < v.size() - 1; j++) {  //A qualquer lugar. (menos nas bordas)
                 delta = deltaReinsertion(v, i, j, qnt);
@@ -274,8 +275,7 @@ void melhorReinsertion(vector<int> &v, int qnt){
                 }
             }
         }
-    }
-    else{
+    } else {
         for (int i = 1; i < v.size() - 1; i++) {// or-2-op/or-3-opt precisa comecar no maximo no penultimo antes do size
             for (int j = 1; j < v.size() - (qnt + 1); j++) {  //E terminar no maximo qnt antes de size
                 delta = deltaReinsertion(v, i, j, qnt);
@@ -288,18 +288,19 @@ void melhorReinsertion(vector<int> &v, int qnt){
         }
 
     }
-    if(x != 0 && y != 0) {
-        movReinsertion(v,x,y,qnt);
+    if (x != 0 && y != 0) {
+        movReinsertion(v, x, y, qnt);
     }
 }
-void movReinsertion(vector<int> &v, int no1, int no2, int qnt){
+
+void movReinsertion(vector<int> &v, int no1, int no2, int qnt) {
 
 
-        for(int i = 1; i <= qnt; i++){
-            int valor = v[no1];
-            v.erase(v.begin() + no1);
-            v.insert(v.begin() + no2, valor);
-        }
+    for (int i = 1; i <= qnt; i++) {
+        int valor = v[no1];
+        v.erase(v.begin() + no1);
+        v.insert(v.begin() + no2, valor);
+    }
 
 
 }
@@ -314,8 +315,7 @@ double deltaReinsertion(vector<int> &v, int no1, int no2, int quantidade) {
         //delta = (m[v[no1]][v[no2]] + m[v[no1]][v[no2 + 1]] + m[v[no1 - 1]][v[no1 + 1]]) -
         //        (m[v[no1]][v[no1 + 1]] + m[v[no1]][v[no1 - 1]] + m[v[no2]][v[no2 + 1]]);
         delta = (m[v[no1]][v[no2]] + m[v[no1 + (quantidade - 1)]][v[no2 + 1]] + m[v[no1 - 1]][v[no1 + quantidade]]) -
-        (m[v[no1]][v[no1 - 1]] + m[v[no1 + (quantidade - 1)]][v[no1 + quantidade]] + m[v[no2]][v[no2 + 1]]);
-
+                (m[v[no1]][v[no1 - 1]] + m[v[no1 + (quantidade - 1)]][v[no1 + quantidade]] + m[v[no2]][v[no2 + 1]]);
 
 
     } else {                     //reinsercao em um indice menor
@@ -330,13 +330,93 @@ double deltaReinsertion(vector<int> &v, int no1, int no2, int quantidade) {
     return delta;
 }
 
-    void printData() {
-        cout << "dimension: " << dimension << endl;
-        for (size_t i = 1; i <= dimension; i++) {
-            for (size_t j = 1; j <= dimension; j++) {
-                cout << matrizAdj[i][j] << " ";
-            }
-            cout << endl;
+void rnvd(vector<int> &v){
+    vector<int> copia = v;
+    vector<int> listaDeVizinhanca = {0,1,2,3,4}; //Cada numero corresponde a um movimento
+    double custoInicial = getCusto(v);
+    double custoMovimento;
+    while(!listaDeVizinhanca.empty()){
+        int x = rand() % listaDeVizinhanca.size();
+        switch(x){
+            case 0:
+                movSwap(copia);
+                custoMovimento = getCusto(copia);
+                if(custoMovimento < custoInicial){
+                    v = copia;      //Movimento melhorou a solucao
+                    custoInicial = custoMovimento;
+                }
+                else{
+                    copia = v;      //solucao nao melhorou, volta a estaca zero
+                    listaDeVizinhanca.erase(listaDeVizinhanca.begin() + x); //Remove o movimento da lista de vizinhancça
+
+                }
+                break;
+            case 1:
+                melhorMov2Opt(copia);
+                custoMovimento = getCusto(copia);
+                if(custoMovimento < custoInicial){
+                    v = copia;      //Movimento melhorou a solucao
+                    custoInicial = custoMovimento;
+                }
+                else{
+                    copia = v;      //solucao nao melhorou, volta a estaca zero
+                    listaDeVizinhanca.erase(listaDeVizinhanca.begin() + x); //Remove o movimento da lista de vizinhancça
+
+                }
+                break;
+
+            case 2:
+                melhorReinsertion(copia,1);
+                custoMovimento = getCusto(copia);
+                if(custoMovimento < custoInicial){
+                    v = copia;      //Movimento melhorou a solucao
+                    custoInicial = custoMovimento;
+                }
+                else{
+                    copia = v;      //solucao nao melhorou, volta a estaca zero
+                    listaDeVizinhanca.erase(listaDeVizinhanca.begin() + x); //Remove o movimento da lista de vizinhancça
+
+                }
+                break;
+            case 3:
+                melhorReinsertion(copia,2);
+                custoMovimento = getCusto(copia);
+                if(custoMovimento < custoInicial){
+                    v = copia;      //Movimento melhorou a solucao
+                    custoInicial = custoMovimento;
+                }
+                else{
+                    copia = v;      //solucao nao melhorou, volta a estaca zero
+                    listaDeVizinhanca.erase(listaDeVizinhanca.begin() + x); //Remove o movimento da lista de vizinhancça
+
+                }
+                break;
+            case 4:
+                melhorReinsertion(copia,3);
+                custoMovimento = getCusto(copia);
+                if(custoMovimento < custoInicial){
+                    v = copia;      //Movimento melhorou a solucao
+                    custoInicial = custoMovimento;
+                }
+                else{
+                    copia = v;      //solucao nao melhorou, volta a estaca zero
+                    listaDeVizinhanca.erase(listaDeVizinhanca.begin() + x); //Remove o movimento da lista de vizinhancça
+
+                }
+                break;
         }
     }
+
+}
+
+
+void printData() {
+    cout << "dimension: " << dimension << endl;
+    for (size_t i = 1; i <= dimension; i++) {
+        for (size_t j = 1; j <= dimension; j++) {
+            cout << matrizAdj[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
 
