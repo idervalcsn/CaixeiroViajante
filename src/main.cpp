@@ -4,6 +4,8 @@
 #include <vector>
 #include <algorithm>
 #include <time.h>
+#include <math.h>
+#include <random>
 
 
 using namespace std;
@@ -42,7 +44,8 @@ void printData();
 
 void rvnd(vector<int> &);
 void remover(vector<int> &, int);                 //remover item atraves do valor
-
+vector<int> perturbar(vector<int> &);
+int gerarRandom(int, int);
 
 
 
@@ -65,18 +68,19 @@ int main(int argc, char **argv) {
     custo1 = getCusto(solution);
 
 
-    cout << endl << "Solucao com rnvd: " << endl;
-    rvnd(solution);
+    cout << endl << "Solucao com perturbacao: " << endl;
+    vector<int> solution2 = perturbar(solution);
 
     for (int i = 0; i <= dimension; i++) {
-        cout << solution[i] << "\t";
+        cout << solution2[i] << "\t";
 
     }
 
 
-    custo2 = getCusto(solution);
+    custo2 = getCusto(solution2);
     delta = custo2 - custo1;
     cout << endl << "Custo 1: " << custo1 << "\t" << "Custo 2: " << custo2 << "\t" << "Delta: " << delta << endl;
+
 
 
     return 0;
@@ -405,11 +409,39 @@ void rvnd(vector<int> &v){
 
 }
 
-void perturbar(vector<int> &v){
-    int size = v.size() - 2;        //ignora-se o inicio e fim do ciclo
-    int p1, p2, p3;                 //as 3 posicoes em que as subsequencias comecam
-    p1 = 1 + rand() % size;
+vector<int> perturbar(vector<int> &v){
 
+    vector<int> vPerturbado;
+    int maxSize = ceil(static_cast<double>(dimension)/10);        //Tamanho maximo de um subsequencia. Conversao estática de dimension int para double
+    int aux = maxSize - 1;                                        //Garante que a sequencia nao exceda o maxsize
+    int ini1, fim1, ini2, fim2;                 //as 4 posicoes que delimitam as subsequencias
+    ini1 = gerarRandom(1, dimension - (2 * maxSize) );  //A primeira pode comecar ate, no maximo, no indice que esteja ate duas vezes o tamanho maximo da subsequencia de distancia do final.
+    fim1 = gerarRandom(ini1+1, ini1 + aux);              //E precisa terminar de tal forma que nao ultrapasse o tamanho maximo.
+    cout << "Ini1: " << ini1 << " Fim1: " << fim1 << endl;
+
+    ini2 = gerarRandom(fim1 + 1, dimension - maxSize);   //A segunda subsequencia precisa comecar ao menos 1 depois do fim da primeira.
+    fim2 = gerarRandom(ini2 + 1, ini2 + aux);
+    cout << "Ini2: " << ini2 << " Fim2: " << fim2 << endl;
+
+    copy(v.begin(),v.begin() + ini1, back_inserter(vPerturbado));   //Copia o vetor original ate o ponto em que a subsequencia a ser trocada comeca
+    copy(v.begin() + ini2, v.begin() + (fim2 + 1), back_inserter(vPerturbado));    //Coloca a segunda subsequencia no lugar da primeira.
+    if((ini2 - fim1) != 1) copy(v.begin() + (fim1 + 1), v.begin() + ini2, back_inserter(vPerturbado));   //checa se sao adjacentes. Caso contrario, há uma copia dupla.
+    copy(v.begin() + ini1, v.begin() + (fim1 + 1), back_inserter(vPerturbado));
+    copy(v.begin() + (fim2 + 1), v.end(), back_inserter(vPerturbado));
+    return vPerturbado;
+
+}
+
+int gerarRandom(int x, int y)
+{
+    int num;
+    std::random_device rd; // obtem um aleatorio do hardware
+    std::mt19937 seed(rd()); // seeda o gerador
+    std::uniform_int_distribution<> gera(x, y); // define o range
+
+
+    num = gera(seed);
+    return num;
 }
 
 void printData() {

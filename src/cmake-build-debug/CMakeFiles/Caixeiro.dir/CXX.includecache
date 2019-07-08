@@ -19,6 +19,10 @@ algorithm
 -
 time.h
 -
+math.h
+-
+random
+-
 
 /home/iderval/Projects/caixeiroCerto/src/readData.h
 

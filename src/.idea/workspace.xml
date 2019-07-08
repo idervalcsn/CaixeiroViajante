@@ -31,8 +31,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="158">
-              <caret line="349" column="48" selection-start-line="349" selection-start-column="48" selection-end-line="349" selection-end-column="48" />
+            <state relative-caret-position="384">
+              <caret line="429" selection-start-line="429" selection-end-line="429" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -77,7 +77,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -89,6 +88,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -100,6 +100,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="xpath.settings" />
   </component>
   <component name="RunDashboard">
@@ -115,7 +116,7 @@
     </option>
   </component>
   <component name="RunManager">
-    <configuration name="Caixeiro" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="instances/burma14.tsp" WORKING_DIR="file://$PROJECT_DIR$/.." PASS_PARENT_ENVS_2="true" PROJECT_NAME="src" TARGET_NAME="Caixeiro" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="src" RUN_TARGET_NAME="Caixeiro">
+    <configuration name="Caixeiro" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="instances/gr21.tsp" WORKING_DIR="file://$PROJECT_DIR$/.." PASS_PARENT_ENVS_2="true" PROJECT_NAME="src" TARGET_NAME="Caixeiro" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="src" RUN_TARGET_NAME="Caixeiro">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -137,18 +138,19 @@
       <workItem from="1562460362914" duration="12000" />
       <workItem from="1562460379239" duration="3110000" />
       <workItem from="1562547009518" duration="164000" />
-      <workItem from="1562547197358" duration="530000" />
+      <workItem from="1562547197358" duration="1291000" />
+      <workItem from="1562622570083" duration="4391000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="36267000" />
+    <option name="totallyTimeSpent" value="41419000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1853" height="1055" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26674044" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1931378" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -178,8 +180,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/main.cpp</url>
-          <line>333</line>
-          <option name="timeStamp" value="14" />
+          <line>414</line>
+          <option name="timeStamp" value="15" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -218,8 +220,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="349" column="48" selection-start-line="349" selection-start-column="48" selection-end-line="349" selection-end-column="48" />
+        <state relative-caret-position="384">
+          <caret line="429" selection-start-line="429" selection-end-line="429" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
