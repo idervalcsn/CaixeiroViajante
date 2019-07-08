@@ -20,7 +20,7 @@ double **matrizAdj; // matriz de adjacencia
 int dimension; // quantidade total de vertices
 
 bool comparaCusto(CustoInsercao, CustoInsercao); // Funcao de comparacao do sort
-vector<int> constructSolution();                   //constroi uma solucao
+vector<int> constructSolution(double);                   //constroi uma solucao
 vector<CustoInsercao>
 criaRestrita(double, vector<CustoInsercao> &); //cria uma lista restrita com os "alpha" melhores custos
 
@@ -47,6 +47,8 @@ void remover(vector<int> &, int);                 //remover item atraves do valo
 vector<int> perturbar(vector<int> &);
 int gerarRandom(int, int);
 
+vector<int> gilsRVND(int, int);
+
 
 
 
@@ -57,30 +59,25 @@ int main(int argc, char **argv) {
     srand(time(NULL));
     readData(argc, argv, &dimension, &matrizAdj);
     printData();
-    vector<int> solution = constructSolution();
-    double custo1, custo2, delta;
 
-    cout << "Solucao sem mov: " << endl;
-    for (int i = 0; i <= dimension; i++) {
-        cout << solution[i] << "\t";
+    vector<int> solucao;
+    double custo;
 
-    }
-    custo1 = getCusto(solution);
+    int I_max = 50;
+    int I_ils;
 
-
-    cout << endl << "Solucao com perturbacao: " << endl;
-    vector<int> solution2 = perturbar(solution);
-
-    for (int i = 0; i <= dimension; i++) {
-        cout << solution2[i] << "\t";
-
+    if (dimension >= 150) {
+        I_ils = dimension / 2;
+    } else {
+        I_ils = dimension;
     }
 
 
-    custo2 = getCusto(solution2);
-    delta = custo2 - custo1;
-    cout << endl << "Custo 1: " << custo1 << "\t" << "Custo 2: " << custo2 << "\t" << "Delta: " << delta << endl;
-
+    solucao = gilsRVND(I_ils, I_max);
+    for(int i = 0; i <= dimension; i++){
+        cout << solucao[i] << endl;
+    }
+    cout << "Custo :" <<  getCusto(solucao) << endl;
 
 
     return 0;
@@ -93,7 +90,7 @@ bool comparaCusto(CustoInsercao x, CustoInsercao y) {
 }
 
 
-vector<int> constructSolution() {
+vector<int> constructSolution(double alpha) {
 
 
     vector<int> solucao = {1, 1};  //Solucao comeca na cidade 1
@@ -116,7 +113,7 @@ vector<int> constructSolution() {
     while (!candidatos.empty()) {
         vector<CustoInsercao> custos = listaDeCustos(solucao, candidatos);
         sort(custos.begin(), custos.end(), comparaCusto);    //sorta baseado no custo de cada insercao
-        vector<CustoInsercao> listaRestrita = criaRestrita(0.5, custos);
+        vector<CustoInsercao> listaRestrita = criaRestrita(alpha, custos);
         int indiceAleatorio = rand() % listaRestrita.size();
         CustoInsercao escolhido = listaRestrita[indiceAleatorio];   //cidade escolhida, onde, e o custo
 
@@ -417,11 +414,11 @@ vector<int> perturbar(vector<int> &v){
     int ini1, fim1, ini2, fim2;                 //as 4 posicoes que delimitam as subsequencias
     ini1 = gerarRandom(1, dimension - (2 * maxSize) );  //A primeira pode comecar ate, no maximo, no indice que esteja ate duas vezes o tamanho maximo da subsequencia de distancia do final.
     fim1 = gerarRandom(ini1+1, ini1 + aux);              //E precisa terminar de tal forma que nao ultrapasse o tamanho maximo.
-    cout << "Ini1: " << ini1 << " Fim1: " << fim1 << endl;
+
 
     ini2 = gerarRandom(fim1 + 1, dimension - maxSize);   //A segunda subsequencia precisa comecar ao menos 1 depois do fim da primeira.
     fim2 = gerarRandom(ini2 + 1, ini2 + aux);
-    cout << "Ini2: " << ini2 << " Fim2: " << fim2 << endl;
+
 
     copy(v.begin(),v.begin() + ini1, back_inserter(vPerturbado));   //Copia o vetor original ate o ponto em que a subsequencia a ser trocada comeca
     copy(v.begin() + ini2, v.begin() + (fim2 + 1), back_inserter(vPerturbado));    //Coloca a segunda subsequencia no lugar da primeira.
@@ -442,6 +439,40 @@ int gerarRandom(int x, int y)
 
     num = gera(seed);
     return num;
+}
+
+vector<int> gilsRVND(int iILS, int iMAX) {
+    int iterILS;
+    int flag = 0;
+    double custo, custoInicial, custoCompara, alpha;
+
+    vector<int> solInicial, solCompara, solFinal;
+    for (int i = 0; i < iMAX; i++ ) {
+        alpha = (double)rand()/(double)RAND_MAX; //gera um numero entre 0 e 1
+        solInicial = constructSolution(alpha);
+        solCompara = solInicial;
+
+        iterILS = 0;
+
+        while(iterILS < iILS){
+            rvnd(solInicial);
+
+            if(getCusto(solInicial) < getCusto(solCompara)){
+                solCompara = solInicial;
+                iterILS = 0;
+
+            }
+            solInicial = perturbar(solCompara);
+            iterILS++;
+            cout << iterILS << "\t" << i << endl;
+        }
+        if(flag == 0 || getCusto(solCompara) < custo){
+            solFinal = solCompara;
+            custo = getCusto(solCompara);
+        }
+
+    }
+    return solFinal;
 }
 
 void printData() {
