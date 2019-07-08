@@ -40,7 +40,7 @@ vector<CustoInsercao>
 listaDeCustos(vector<int> &, vector<int> &);   //cria uma lista de custos baseada nos candidatos restantes
 void printData();
 
-void rnvd(vector<int> &);
+void rvnd(vector<int> &);
 void remover(vector<int> &, int);                 //remover item atraves do valor
 
 
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 
 
     cout << endl << "Solucao com rnvd: " << endl;
-    rnvd(solution);
+    rvnd(solution);
 
     for (int i = 0; i <= dimension; i++) {
         cout << solution[i] << "\t";
@@ -330,14 +330,14 @@ double deltaReinsertion(vector<int> &v, int no1, int no2, int quantidade) {
     return delta;
 }
 
-void rnvd(vector<int> &v){
+void rvnd(vector<int> &v){
     vector<int> copia = v;
     vector<int> listaDeVizinhanca = {0,1,2,3,4}; //Cada numero corresponde a um movimento
     double custoInicial = getCusto(v);
     double custoMovimento;
     while(!listaDeVizinhanca.empty()){
         int x = rand() % listaDeVizinhanca.size();
-        switch(x){
+        switch(listaDeVizinhanca[x]){
             case 0:
                 movSwap(copia);
                 custoMovimento = getCusto(copia);
@@ -347,7 +347,7 @@ void rnvd(vector<int> &v){
                 }
                 else{
                     copia = v;      //solucao nao melhorou, volta a estaca zero
-                    listaDeVizinhanca.erase(listaDeVizinhanca.begin() + x); //Remove o movimento da lista de vizinhancça
+                    remover(listaDeVizinhanca, 0); //Remove o movimento da lista de vizinhancça
 
                 }
                 break;
@@ -360,8 +360,7 @@ void rnvd(vector<int> &v){
                 }
                 else{
                     copia = v;      //solucao nao melhorou, volta a estaca zero
-                    listaDeVizinhanca.erase(listaDeVizinhanca.begin() + x); //Remove o movimento da lista de vizinhancça
-
+                    remover(listaDeVizinhanca, 1); //Remove o movimento da lista de vizinhancça
                 }
                 break;
 
@@ -374,8 +373,7 @@ void rnvd(vector<int> &v){
                 }
                 else{
                     copia = v;      //solucao nao melhorou, volta a estaca zero
-                    listaDeVizinhanca.erase(listaDeVizinhanca.begin() + x); //Remove o movimento da lista de vizinhancça
-
+                    remover(listaDeVizinhanca, 2); //Remove o movimento da lista de vizinhancça
                 }
                 break;
             case 3:
@@ -387,8 +385,7 @@ void rnvd(vector<int> &v){
                 }
                 else{
                     copia = v;      //solucao nao melhorou, volta a estaca zero
-                    listaDeVizinhanca.erase(listaDeVizinhanca.begin() + x); //Remove o movimento da lista de vizinhancça
-
+                    remover(listaDeVizinhanca, 3); //Remove o movimento da lista de vizinhancça
                 }
                 break;
             case 4:
@@ -400,8 +397,7 @@ void rnvd(vector<int> &v){
                 }
                 else{
                     copia = v;      //solucao nao melhorou, volta a estaca zero
-                    listaDeVizinhanca.erase(listaDeVizinhanca.begin() + x); //Remove o movimento da lista de vizinhancça
-
+                    remover(listaDeVizinhanca, 4); //Remove o movimento da lista de vizinhancça
                 }
                 break;
         }
@@ -409,6 +405,12 @@ void rnvd(vector<int> &v){
 
 }
 
+void perturbar(vector<int> &v){
+    int size = v.size() - 2;        //ignora-se o inicio e fim do ciclo
+    int p1, p2, p3;                 //as 3 posicoes em que as subsequencias comecam
+    p1 = 1 + rand() % size;
+
+}
 
 void printData() {
     cout << "dimension: " << dimension << endl;
