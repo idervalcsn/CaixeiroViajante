@@ -42,7 +42,7 @@ vector<CustoInsercao>
 listaDeCustos(vector<int> &, vector<int> &);   //cria uma lista de custos baseada nos candidatos restantes
 void printData();
 
-void rvnd(vector<int> &);
+void rvnd(vector<int> &, double &);
 void remover(vector<int> &, int);                 //remover item atraves do valor
 vector<int> perturbar(vector<int> &);
 int gerarRandom(int, int);
@@ -71,13 +71,27 @@ int main(int argc, char **argv) {
     } else {
         I_ils = dimension;
     }
+/*    solucao = constructSolution(0.4);
+    custo = getCusto(solucao);
+    cout << "Custo: " << custo << endl;
 
 
-    solucao = gilsRVND(I_ils, I_max);
-    for(int i = 0; i <= dimension; i++){
-        cout << solucao[i] << endl;
+
+    double custo2 = getCusto(solucao);
+    cout << "Custo: " << getCusto(solucao) << " Delta: " << endl;
+    cout << "Seboso: " << custo2 - custo << endl;*/
+    int i = 0;
+    while(i < 15) {
+        solucao = gilsRVND(I_ils, I_max);
+
+        //for (int i = 0; i <= dimension; i++) {
+        //    cout << solucao[i] << endl;
+        //}
+        cout << "Custo :" << getCusto(solucao) << endl;
+        i++;
     }
-    cout << "Custo :" <<  getCusto(solucao) << endl;
+
+
 
 
     return 0;
@@ -196,6 +210,7 @@ void movSwap(vector<int> &v) {
         swap(v[x], v[y]);
     }
 
+
 }
 
 double deltaSwap(vector<int> &v, int no1, int no2) {
@@ -231,6 +246,7 @@ void melhorMov2Opt(vector<int> &v) {
     if (x != 0 && y != 0) {
         mov2Opt(v, x, y);
     }
+
 }
 
 void mov2Opt(vector<int> &v, int no1, int no2) {
@@ -292,6 +308,7 @@ void melhorReinsertion(vector<int> &v, int qnt) {
     if (x != 0 && y != 0) {
         movReinsertion(v, x, y, qnt);
     }
+
 }
 
 void movReinsertion(vector<int> &v, int no1, int no2, int qnt) {
@@ -331,20 +348,21 @@ double deltaReinsertion(vector<int> &v, int no1, int no2, int quantidade) {
     return delta;
 }
 
-void rvnd(vector<int> &v){
+void rvnd(vector<int> &v, double &custoSolucao){
     vector<int> copia = v;
     vector<int> listaDeVizinhanca = {0,1,2,3,4}; //Cada numero corresponde a um movimento
-    double custoInicial = getCusto(v);
+    //double custoInicial = getCusto(v);
     double custoMovimento;
     while(!listaDeVizinhanca.empty()){
         int x = rand() % listaDeVizinhanca.size();
         switch(listaDeVizinhanca[x]){
             case 0:
-                movSwap(copia);
+                movSwap(copia);     //////MUDAR
                 custoMovimento = getCusto(copia);
-                if(custoMovimento < custoInicial){
+                if(custoMovimento < custoSolucao){
                     v = copia;      //Movimento melhorou a solucao
-                    custoInicial = custoMovimento;
+                    //custoInicial = custoMovimento;
+                    custoSolucao = custoMovimento;
                 }
                 else{
                     copia = v;      //solucao nao melhorou, volta a estaca zero
@@ -355,9 +373,10 @@ void rvnd(vector<int> &v){
             case 1:
                 melhorMov2Opt(copia);
                 custoMovimento = getCusto(copia);
-                if(custoMovimento < custoInicial){
+                if(custoMovimento < custoSolucao){
                     v = copia;      //Movimento melhorou a solucao
-                    custoInicial = custoMovimento;
+                    //custoInicial = custoMovimento;
+                    custoSolucao = custoMovimento;
                 }
                 else{
                     copia = v;      //solucao nao melhorou, volta a estaca zero
@@ -368,9 +387,10 @@ void rvnd(vector<int> &v){
             case 2:
                 melhorReinsertion(copia,1);
                 custoMovimento = getCusto(copia);
-                if(custoMovimento < custoInicial){
+                if(custoMovimento < custoSolucao){
                     v = copia;      //Movimento melhorou a solucao
-                    custoInicial = custoMovimento;
+                    //custoInicial = custoMovimento;
+                    custoSolucao = custoMovimento;
                 }
                 else{
                     copia = v;      //solucao nao melhorou, volta a estaca zero
@@ -380,9 +400,10 @@ void rvnd(vector<int> &v){
             case 3:
                 melhorReinsertion(copia,2);
                 custoMovimento = getCusto(copia);
-                if(custoMovimento < custoInicial){
+                if(custoMovimento < custoSolucao){
                     v = copia;      //Movimento melhorou a solucao
-                    custoInicial = custoMovimento;
+                    //custoInicial = custoMovimento;
+                    custoSolucao = custoMovimento;
                 }
                 else{
                     copia = v;      //solucao nao melhorou, volta a estaca zero
@@ -392,9 +413,10 @@ void rvnd(vector<int> &v){
             case 4:
                 melhorReinsertion(copia,3);
                 custoMovimento = getCusto(copia);
-                if(custoMovimento < custoInicial){
+                if(custoMovimento < custoSolucao){
                     v = copia;      //Movimento melhorou a solucao
-                    custoInicial = custoMovimento;
+                    //custoInicial = custoMovimento;
+                    custoSolucao = custoMovimento;
                 }
                 else{
                     copia = v;      //solucao nao melhorou, volta a estaca zero
@@ -448,27 +470,32 @@ vector<int> gilsRVND(int iILS, int iMAX) {
 
     vector<int> solInicial, solCompara, solFinal;
     for (int i = 0; i < iMAX; i++ ) {
-        alpha = (double)rand()/(double)RAND_MAX; //gera um numero entre 0 e 1
+        alpha = (double)rand()/RAND_MAX; //gera um numero entre 0 e 1
         solInicial = constructSolution(alpha);
         solCompara = solInicial;
 
+        custoCompara = getCusto(solCompara);
+        custoInicial = custoCompara;
         iterILS = 0;
 
         while(iterILS < iILS){
-            rvnd(solInicial);
+            rvnd(solInicial, custoInicial);
 
-            if(getCusto(solInicial) < getCusto(solCompara)){
+
+            if(custoInicial < custoCompara){
                 solCompara = solInicial;
+                custoCompara = custoInicial;
                 iterILS = 0;
 
             }
             solInicial = perturbar(solCompara);
             iterILS++;
-            cout << iterILS << "\t" << i << endl;
+            //cout << iterILS << "\t" << i << endl;
         }
-        if(flag == 0 || getCusto(solCompara) < custo){
+        if(flag == 0 || custoCompara < custo){
             solFinal = solCompara;
-            custo = getCusto(solCompara);
+            custo = custoCompara;
+            flag = 1;
         }
 
     }
