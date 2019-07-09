@@ -6,7 +6,7 @@
 #include <time.h>
 #include <math.h>
 #include <random>
-
+#include <limits>
 
 using namespace std;
 
@@ -80,24 +80,23 @@ int main(int argc, char **argv) {
     double custo2 = getCusto(solucao);
     cout << "Custo: " << getCusto(solucao) << " Delta: " << endl;
     cout << "Seboso: " << custo2 - custo << endl;*/
-    int i = 0;
-    while(i < 15) {
-        solucao = gilsRVND(I_ils, I_max);
 
-        //for (int i = 0; i <= dimension; i++) {
-        //    cout << solucao[i] << endl;
-        //}
+
+        solucao = gilsRVND(I_ils, I_max);
+        for (int i = 0; i <= dimension; i++) {
+            cout << solucao[i] << endl;
+        }
         cout << "Custo :" << getCusto(solucao) << endl;
-        i++;
-    }
+
+
 
 
 
 
     return 0;
-
-
 }
+
+
 
 bool comparaCusto(CustoInsercao x, CustoInsercao y) {
     return x.custo < y.custo;
@@ -465,8 +464,9 @@ int gerarRandom(int x, int y)
 
 vector<int> gilsRVND(int iILS, int iMAX) {
     int iterILS;
-    int flag = 0;
-    double custo, custoInicial, custoCompara, alpha;
+
+    double custo = numeric_limits<double>::infinity();
+    double custoInicial, custoCompara, alpha;
 
     vector<int> solInicial, solCompara, solFinal;
     for (int i = 0; i < iMAX; i++ ) {
@@ -490,12 +490,12 @@ vector<int> gilsRVND(int iILS, int iMAX) {
             }
             solInicial = perturbar(solCompara);
             iterILS++;
-            //cout << iterILS << "\t" << i << endl;
+            cout << iterILS << "\t" << i << endl;
         }
-        if(flag == 0 || custoCompara < custo){
+        if(custoCompara < custo){
             solFinal = solCompara;
             custo = custoCompara;
-            flag = 1;
+            
         }
 
     }
