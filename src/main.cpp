@@ -20,15 +20,13 @@ double **matrizAdj; // matriz de adjacencia
 int dimension; // quantidade total de vertices
 
 bool comparaCusto(CustoInsercao, CustoInsercao); // Funcao de comparacao do sort
-vector<int> constructSolution(double);                   //constroi uma solucao
+vector<int> constructSolution(double, double &);                   //constroi uma solucao
 vector<CustoInsercao>
 criaRestrita(double, vector<CustoInsercao> &); //cria uma lista restrita com os "alpha" melhores custos
 
 double deltaSwap(vector<int> &, int, int);     //calcula o delta de determinado movimento swap (troca de nos)
 void movSwap(vector<int> &);            //executa um movimento swap
 void melhorMov2Opt(vector<int> &);
-
-void mov2Opt(vector<int> &, int, int);
 
 double delta2Opt(vector<int> &, int,
                  int);      //calcula o delta de determinado movimento 2-opt (inverte o subtour que vai de no1 a no2 )
@@ -50,7 +48,8 @@ int gerarRandom(int, int);
 vector<int> gilsRVND(int, int);
 
 
-
+random_device rd;
+default_random_engine rng(rd());
 
 
 int main(int argc, char **argv) {
@@ -61,7 +60,7 @@ int main(int argc, char **argv) {
     printData();
 
     vector<int> solucao;
-    double custo;
+    double custo, delta;
 
     int I_max = 50;
     int I_ils;
@@ -103,7 +102,7 @@ bool comparaCusto(CustoInsercao x, CustoInsercao y) {
 }
 
 
-vector<int> constructSolution(double alpha) {
+vector<int> constructSolution(double alpha, double &custo) {
 
 
     vector<int> solucao = {1, 1};  //Solucao comeca na cidade 1
@@ -134,7 +133,7 @@ vector<int> constructSolution(double alpha) {
         remover(candidatos, escolhido.noInserido);
 
     }
-
+    custo = getCusto(solucao);
     return solucao;
 
 
@@ -192,20 +191,20 @@ void movSwap(vector<int> &v) {
     v[no2] = temp;*/
     double menorDelta = 0;
     double delta;
-    int x = 0, y = 0; //guarda as coordenadas do melhor swap
+    int x = -1, y = -1; //guarda as coordenadas do melhor swap
 
     for (int i = 1; i < v.size() -
                         1; i++) {//Ignora o primeiro e ultimo. Por consequencia, o penultimo tbm, pq ja vai ter realizado swap com todos.
         for (int j = i + 1; j < v.size() - 1; j++) {  //os swaps comecam a partir do item subsequente ao item "i"
             delta = deltaSwap(v, i, j);
-            if (delta < menorDelta) {
+            if (delta <= menorDelta) {
                 menorDelta = delta;
                 x = i;
                 y = j;
             }
         }
     }
-    if (x != 0 && y != 0) {
+    if (x != -1 && y != -1) {
         swap(v[x], v[y]);
     }
 
@@ -235,7 +234,7 @@ void melhorMov2Opt(vector<int> &v) {
     for (int i = 1; i < v.size() - 2; i++) {//O twopt precisa começar no maximo no antepenultimo elemento,
         for (int j = i + 1; j < v.size() - 1; j++) {  //e terminar no penultimo.
             delta = delta2Opt(v, i, j);
-            if (delta < menorDelta) {
+            if (delta <= menorDelta) {
                 menorDelta = delta;
                 x = i;
                 y = j;
@@ -243,13 +242,14 @@ void melhorMov2Opt(vector<int> &v) {
         }
     }
     if (x != 0 && y != 0) {
-        mov2Opt(v, x, y);
+        reverse(v.begin() + x, v.begin() + y + 1);
     }
+
 
 }
 
 void mov2Opt(vector<int> &v, int no1, int no2) {
-    vector<int> newLista(v.size());
+    /*vector<int> newLista(v.size());
     for (int i = 0; i < no1; i++) {   //Solucao antes da subsequencia a ser invertida
         newLista[i] = v[i];
     }
@@ -261,7 +261,9 @@ void mov2Opt(vector<int> &v, int no1, int no2) {
     for (int i = no2 + 1; i < v.size(); i++) {   //Solucao depois da subsequencia a ser invertida
         newLista[i] = v[i];
     }
-    v.swap(newLista);
+    v.swap(newLista);*/
+
+    reverse(v.begin() + no1, v.begin() + no2+1);
 }
 
 double delta2Opt(vector<int> &v, int no1, int no2) {
@@ -284,7 +286,7 @@ void melhorReinsertion(vector<int> &v, int qnt) {
         for (int i = 1; i < v.size() - 1; i++) {//Reinsertion pode ser de qualquer lugar.
             for (int j = 1; j < v.size() - 1; j++) {  //A qualquer lugar. (menos nas bordas)
                 delta = deltaReinsertion(v, i, j, qnt);
-                if (delta < menorDelta) {
+                if (delta <= menorDelta) {
                     menorDelta = delta;
                     x = i;
                     y = j;
@@ -295,7 +297,7 @@ void melhorReinsertion(vector<int> &v, int qnt) {
         for (int i = 1; i < v.size() - 1; i++) {// or-2-op/or-3-opt precisa comecar no maximo no penultimo antes do size
             for (int j = 1; j < v.size() - (qnt + 1); j++) {  //E terminar no maximo qnt antes de size
                 delta = deltaReinsertion(v, i, j, qnt);
-                if (delta < menorDelta && abs((i - j)) >= qnt) {
+                if (delta <= menorDelta && abs((i - j)) >= qnt) {
                     menorDelta = delta;
                     x = i;
                     y = j;
@@ -307,6 +309,7 @@ void melhorReinsertion(vector<int> &v, int qnt) {
     if (x != 0 && y != 0) {
         movReinsertion(v, x, y, qnt);
     }
+
 
 }
 
@@ -435,10 +438,11 @@ vector<int> perturbar(vector<int> &v){
     int ini1, fim1, ini2, fim2;                 //as 4 posicoes que delimitam as subsequencias
     ini1 = gerarRandom(1, dimension - (2 * maxSize) );  //A primeira pode comecar ate, no maximo, no indice que esteja ate duas vezes o tamanho maximo da subsequencia de distancia do final.
     fim1 = gerarRandom(ini1+1, ini1 + aux);              //E precisa terminar de tal forma que nao ultrapasse o tamanho maximo.
-
+    //cout << endl << "Ini1 - fim1 = " << ini1 - fim1 << endl;
 
     ini2 = gerarRandom(fim1 + 1, dimension - maxSize);   //A segunda subsequencia precisa comecar ao menos 1 depois do fim da primeira.
     fim2 = gerarRandom(ini2 + 1, ini2 + aux);
+    //cout << endl << "Ini2 - fim2 = " << ini2 - fim2 << endl;
 
 
     copy(v.begin(),v.begin() + ini1, back_inserter(vPerturbado));   //Copia o vetor original ate o ponto em que a subsequencia a ser trocada comeca
@@ -471,13 +475,11 @@ vector<int> gilsRVND(int iILS, int iMAX) {
     vector<int> solInicial, solCompara, solFinal;
     for (int i = 0; i < iMAX; i++ ) {
         alpha = (double)rand()/RAND_MAX; //gera um numero entre 0 e 1
-        solInicial = constructSolution(alpha);
+        solInicial = constructSolution(alpha, custoInicial);
         solCompara = solInicial;
+        custoCompara = custoInicial;
 
-        custoCompara = getCusto(solCompara);
-        custoInicial = custoCompara;
         iterILS = 0;
-
         while(iterILS < iILS){
             rvnd(solInicial, custoInicial);
 
@@ -489,6 +491,7 @@ vector<int> gilsRVND(int iILS, int iMAX) {
 
             }
             solInicial = perturbar(solCompara);
+
             iterILS++;
             cout << iterILS << "\t" << i << endl;
         }
