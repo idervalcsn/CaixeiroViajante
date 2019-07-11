@@ -280,7 +280,7 @@ double delta2Opt(vector<int> &v, int no1, int no2) {
 void melhorReinsertion(vector<int> &v, int qnt) {
     double menorDelta = 0;
     double delta;
-    int x = 0, y = 0; //guarda as coordenadas da melhor reinsertion
+    int x = -1, y = -1; //guarda as coordenadas da melhor reinsertion
 
     if (qnt == 1) {
         for (int i = 1; i < v.size() - 1; i++) {//Reinsertion pode ser de qualquer lugar.
@@ -295,9 +295,9 @@ void melhorReinsertion(vector<int> &v, int qnt) {
         }
     } else {
         for (int i = 1; i < v.size() - 1; i++) {// or-2-op/or-3-opt precisa comecar no maximo no penultimo antes do size
-            for (int j = 1; j < v.size() - (qnt + 1); j++) {  //E terminar no maximo qnt antes de size
+            for (int j = 1; j < v.size() - qnt; j++) {  //E terminar no maximo qnt antes de size
                 delta = deltaReinsertion(v, i, j, qnt);
-                if (delta <= menorDelta && abs((i - j)) >= qnt) {
+                if (delta <= menorDelta && abs(i - j) > 3) {
                     menorDelta = delta;
                     x = i;
                     y = j;
@@ -306,8 +306,9 @@ void melhorReinsertion(vector<int> &v, int qnt) {
         }
 
     }
-    if (x != 0 && y != 0) {
+    if (x != -1 && y != -1) {
         movReinsertion(v, x, y, qnt);
+        //cout << endl << "Qnt: " << qnt << " i,j : " << x << " " << y << endl;
     }
 
 
@@ -357,71 +358,73 @@ void rvnd(vector<int> &v, double &custoSolucao){
     double custoMovimento;
     while(!listaDeVizinhanca.empty()){
         int x = rand() % listaDeVizinhanca.size();
+        custoSolucao = getCusto(v);
         switch(listaDeVizinhanca[x]){
             case 0:
-                movSwap(copia);     //////MUDAR
-                custoMovimento = getCusto(copia);
+                movSwap(v);     //////MUDAR
+
+                custoMovimento = getCusto(v);
                 if(custoMovimento < custoSolucao){
-                    v = copia;      //Movimento melhorou a solucao
+                    copia = v;      //Movimento melhorou a solucao
                     //custoInicial = custoMovimento;
                     custoSolucao = custoMovimento;
                 }
                 else{
-                    copia = v;      //solucao nao melhorou, volta a estaca zero
+                    v = copia;      //solucao nao melhorou, volta a estaca zero
                     remover(listaDeVizinhanca, 0); //Remove o movimento da lista de vizinhancça
 
                 }
                 break;
             case 1:
-                melhorMov2Opt(copia);
-                custoMovimento = getCusto(copia);
+                melhorMov2Opt(v);
+                custoMovimento = getCusto(v);
                 if(custoMovimento < custoSolucao){
-                    v = copia;      //Movimento melhorou a solucao
+                    copia = v;      //Movimento melhorou a solucao
                     //custoInicial = custoMovimento;
                     custoSolucao = custoMovimento;
                 }
                 else{
-                    copia = v;      //solucao nao melhorou, volta a estaca zero
+                    v = copia;      //solucao nao melhorou, volta a estaca zero
                     remover(listaDeVizinhanca, 1); //Remove o movimento da lista de vizinhancça
                 }
                 break;
 
             case 2:
-                melhorReinsertion(copia,1);
-                custoMovimento = getCusto(copia);
+                melhorReinsertion(v,1);
+                custoMovimento = getCusto(v);
                 if(custoMovimento < custoSolucao){
-                    v = copia;      //Movimento melhorou a solucao
+                    copia = v;      //Movimento melhorou a solucao
                     //custoInicial = custoMovimento;
                     custoSolucao = custoMovimento;
                 }
                 else{
-                    copia = v;      //solucao nao melhorou, volta a estaca zero
+                    v = copia;      //solucao nao melhorou, volta a estaca zero
                     remover(listaDeVizinhanca, 2); //Remove o movimento da lista de vizinhancça
                 }
                 break;
             case 3:
-                melhorReinsertion(copia,2);
-                custoMovimento = getCusto(copia);
+                melhorReinsertion(v,2);
+                custoMovimento = getCusto(v);
                 if(custoMovimento < custoSolucao){
-                    v = copia;      //Movimento melhorou a solucao
+                    copia = v;      //Movimento melhorou a solucao
                     //custoInicial = custoMovimento;
                     custoSolucao = custoMovimento;
                 }
                 else{
-                    copia = v;      //solucao nao melhorou, volta a estaca zero
+                    v = copia;      //solucao nao melhorou, volta a estaca zero
                     remover(listaDeVizinhanca, 3); //Remove o movimento da lista de vizinhancça
                 }
                 break;
             case 4:
-                melhorReinsertion(copia,3);
-                custoMovimento = getCusto(copia);
+                melhorReinsertion(v,3);
+                custoMovimento = getCusto(v);
                 if(custoMovimento < custoSolucao){
-                    v = copia;      //Movimento melhorou a solucao
+                    copia = v;      //Movimento melhorou a solucao
                     //custoInicial = custoMovimento;
                     custoSolucao = custoMovimento;
                 }
                 else{
-                    copia = v;      //solucao nao melhorou, volta a estaca zero
+                    v = copia;      //solucao nao melhorou, volta a estaca zero
                     remover(listaDeVizinhanca, 4); //Remove o movimento da lista de vizinhancça
                 }
                 break;
