@@ -7,6 +7,7 @@
 #include <math.h>
 #include <random>
 #include <limits>
+#include <chrono>
 
 using namespace std;
 
@@ -77,8 +78,12 @@ int main(int argc, char **argv) {
     cout << "Custo: " << getCusto(solucao) << " Delta: " << endl;
     cout << "Seboso: " << custo2 - custo << endl;*/
 
-
+    auto start = std::chrono::high_resolution_clock::now();
     solucao = gilsRVND(I_ils, I_max);
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    std::cout << "Elapsed time: " << elapsed.count() << " s\n";
+
     for (int i = 0; i <= dimension; i++) {
         cout << solucao[i] << endl;
     }
@@ -112,7 +117,7 @@ vector<int> constructSolution(double alpha, double &custo) {
         candidatos.push_back(atual);
     }
 
-    for (int i = 0; i < tamanhoSubtour; i++) { //Gerando subtour inicial
+    for (int i = 0; i < dimension/2; i++) { //Gerando subtour inicial
 
         int j = rand() % candidatos.size();
         solucao.insert(solucao.begin() + 1, candidatos[j]);
@@ -209,7 +214,9 @@ void movSwap(vector<int> &v, double &custo) {
         }
     }
     if (x != -1 && y != -1) {
-        swap(v[x], v[y]);
+        int temp = v[x];
+        v[x] = v[y];
+        v[y] = temp;
         custo += menorDelta;
     }
 
@@ -318,8 +325,8 @@ void melhorReinsertion(vector<int> &v, int quantidade, double &custo) {
             }
         }
     } else {
-        for (int i = 1; i < v.size() - 1; i++) {// or-2-op/or-3-opt precisa comecar no maximo no penultimo antes do size
-            for (int j = 1; j < v.size() - quantidade; j++) {  //E terminar no maximo qnt antes de size
+        for (int i = 1; i < v.size() - quantidade; i++) {// or-2-op/or-3-opt precisa comecar no maximo no penultimo antes do size
+            for (int j = 1; j < v.size() - (quantidade + 1); j++) {  //E terminar no maximo qnt antes de size
                 if (i == j) delta = 0;
 
                 else if (i < j) {     //reinsercao em um indice maior do vetor
@@ -346,8 +353,14 @@ void melhorReinsertion(vector<int> &v, int quantidade, double &custo) {
 
     }
     if (x != -1 && y != -1) {
-        movReinsertion(v, x, y, quantidade);
-        custo += menorDelta;
+        if(quantidade != 1){
+            v.erase(v.begin() + x, v.begin() + x + quantidade);
+            v.insert(v.begin() + y, &v[x], &v[x] + quantidade);
+        }
+        else{
+            v.erase(v.begin() + x);
+            v.insert(v.begin() + y, v[x]);
+        }
     }
 
 
@@ -355,12 +368,10 @@ void melhorReinsertion(vector<int> &v, int quantidade, double &custo) {
 
 void movReinsertion(vector<int> &v, int no1, int no2, int qnt) {
 
+    int valor = v[no1];
+    v.erase(v.begin() + no1, v.begin() + (qnt-1));
+    v.insert(v.begin() + no2, valor);
 
-    for (int i = 1; i <= qnt; i++) {
-        int valor = v[no1];
-        v.erase(v.begin() + no1);
-        v.insert(v.begin() + no2, valor);
-    }
 
 
 }
@@ -486,11 +497,16 @@ vector<int> gilsRVND(int iILS, int iMAX) {
         solInicial = constructSolution(alpha, custoInicial);
         solCompara = solInicial;
         custoCompara = custoInicial;
-        cout << "Construcao " << i << endl;
+        //cout << "Construcao " << i << endl;
         iterILS = 0;
-        while(iterILS < iILS){
-            rvnd(solInicial, custoInicial);
 
+
+        while(iterILS < iILS){
+           // auto start = std::chrono::high_resolution_clock::now();
+            rvnd(solInicial, custoInicial);
+           /* auto finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsed = finish - start;
+            std::cout << "Elapsed time: " << elapsed.count() << " s\n";*/
 
             if(custoInicial < custoCompara){
                 solCompara = solInicial;
@@ -503,9 +519,12 @@ vector<int> gilsRVND(int iILS, int iMAX) {
             iterILS++;
             //cout << iterILS << "\t" << i << endl;
         }
+
+
         if(custoCompara < custo){
             solFinal = solCompara;
             custo = custoCompara;
+            cout << endl << "Custo: " << custo << endl;
 
         }
 

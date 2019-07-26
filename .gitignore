@@ -2,3 +2,7 @@
 /src/.idea
 /src/.vscode
 /src/arquiv
+callgrind.out.11585
+gmon.out
+report.txt
+repor2t.txt
