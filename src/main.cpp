@@ -353,14 +353,8 @@ void melhorReinsertion(vector<int> &v, int quantidade, double &custo) {
 
     }
     if (x != -1 && y != -1) {
-        if(quantidade != 1){
-            v.erase(v.begin() + x, v.begin() + x + quantidade);
-            v.insert(v.begin() + y, &v[x], &v[x] + quantidade);
-        }
-        else{
-            v.erase(v.begin() + x);
-            v.insert(v.begin() + y, v[x]);
-        }
+        movReinsertion(v, x, y, quantidade);
+        custo += menorDelta;
     }
 
 
@@ -368,10 +362,12 @@ void melhorReinsertion(vector<int> &v, int quantidade, double &custo) {
 
 void movReinsertion(vector<int> &v, int no1, int no2, int qnt) {
 
-    int valor = v[no1];
-    v.erase(v.begin() + no1, v.begin() + (qnt-1));
-    v.insert(v.begin() + no2, valor);
 
+    for (int i = 1; i <= qnt; i++) {
+        int valor = v[no1];
+        v.erase(v.begin() + no1);
+        v.insert(v.begin() + no2, valor);
+    }
 
 
 }
