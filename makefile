@@ -1,3 +1,5 @@
+CPLEX_VERSION = 12.4
+
 #detecta se o sistema é de 32 ou 64 bits
 BITS_OPTION = -m64
 
@@ -6,11 +8,12 @@ CPPC = g++
 #############################
 
 #### opcoes de compilacao e includes
-CCOPT = $(BITS_OPTION) -O3 -fPIC -fexceptions -DNDEBUG -DIL_STD -std=c++0x  
+CCOPT = $(BITS_OPTION) -O3 -fPIC -fexceptions -DNDEBUG -DIL_STD -std=c++0x
 CONCERTINCDIR = $(CONCERTDIR)/include
+CPLEXINCDIR   = $(CPLEXDIR)/include
+CCFLAGS = $(CCOPT) -I$(CPLEXINCDIR) -I$(CONCERTINCDIR)
 #############################
 
-#### flags do linker
 #############################
 
 #### diretorios com os source files e com os objs files
