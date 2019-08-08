@@ -11,7 +11,7 @@
 
 using namespace std;
 
-
+//teste
 struct CustoInsercao {
     int noInserido;
     int arestaRemovida;
